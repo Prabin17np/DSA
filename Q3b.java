@@ -1,4 +1,10 @@
 
+/*
+    A Game of Tetris
+    Functionality:
+    Queue: Use a queue to store the sequence of falling blocks.
+    Stack: Use a stack to represent the current state of the game board.
+ */
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;

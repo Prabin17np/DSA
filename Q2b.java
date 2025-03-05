@@ -1,3 +1,16 @@
+/*
+ Problem: Find the closest pair of points based on Manhattan distance. If multiple pairs have the same distance, choose the lexicographically smallest pair.
+
+Approach:
+
+Iterate through all pairs of points (i, j) where i < j.
+
+Calculate the Manhattan distance between each pair.
+
+Track the pair with the smallest distance.
+
+If distances are equal, choose the pair with the smallest lexicographical order.*/
+
 import java.util.Arrays;
 
 public class Q2b {
@@ -43,3 +56,6 @@ public class Q2b {
         System.out.println(Arrays.toString(result)); // Output: [0, 3]
     }
 }
+
+// Output
+// [0, 3]

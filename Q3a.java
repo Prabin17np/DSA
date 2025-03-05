@@ -94,3 +94,6 @@ public class Q3a {
         System.out.println(minCostToConnectDevices(n, modules, connections)); // Output: 3
     }
 }
+
+// output
+// Minimum total cost to connect all devices: 3

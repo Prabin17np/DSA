@@ -1,3 +1,34 @@
+/*
+    You are given a class NumberPrinter with three methods: printZero, printEven, and printOdd.
+    These methods are designed to print the numbers 0, even numbers, and odd numbers, respectively.
+    Task:
+    Create a ThreadController class that coordinates three threads:
+    5. ZeroThread: Calls printZero to print 0s.
+    6. EvenThread: Calls printEven to print even numbers.
+    7. OddThread: Calls printOdd to print odd numbers.
+    These threads should work together to print the sequence "0102030405..." up to a specified number n.
+The output should be interleaved, ensuring that the numbers are printed in the correct order.
+ */
+
+/*
+   Approach
+   Use Three Threads: One for printing 0, one for even numbers, and one for odd numbers.
+   Synchronization: Use a shared lock to control execution order.
+   Wait-Notify Mechanism:
+   printZero() waits for its turn (when count % 2 == 0).
+   printOdd() waits for count % 4 == 1.
+   printEven() waits for count % 4 == 3.
+   After printing, each thread increments count and notifies all waiting threads.
+   Ensuring Proper Order: Threads execute alternately, ensuring the output format 0 X 0 Y 0 Z ....
+   Time Complexity:
+   O(n) – Each number (zero, odd, even) is printed exactly once in sequence.
+
+   Space Complexity:
+   O(1) – Only a few variables and synchronization objects are used, independent of n. 🚀
+*/
+
+// A class responsible for printing numbers in a synchronized manner.
+
 class NumberPrinter {
     // Method to print zero
     public void printZero() {
@@ -93,3 +124,4 @@ public class Q6a {
         oddThread.start();
     }
 }
+// output: 0102030405

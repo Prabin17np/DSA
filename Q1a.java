@@ -26,3 +26,9 @@ public class Q1a {
                                                                                                                         // 4
     }
 }
+
+/*
+ * Minimum measurements for k=1, n=2: 2
+ * Minimum measurements for k=2, n=6: 3
+ * Minimum measurements for k=3, n=14: 4
+ */

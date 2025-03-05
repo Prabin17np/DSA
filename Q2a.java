@@ -44,3 +44,24 @@ public class Q2a {
         System.out.println(minRewards(ratings2)); // Output: 4
     }
 }
+
+/*
+ * Example 1:
+ * Input: ratings = [1, 0, 2]
+ * Output: 5
+ * Explanation: You can allocate rewards as follows:
+ * - First employee: 2 rewards
+ * - Second employee: 1 reward
+ * - Third employee: 2 rewards
+ * Total rewards required = 5
+ * 
+ * Example 2:
+ * Input: ratings = [1, 2, 2]
+ * Output: 4
+ * Explanation: You can allocate rewards as follows:
+ * - First employee: 1 reward
+ * - Second employee: 2 rewards
+ * - Third employee: 1 reward
+ * The third employee gets 1 reward because it satisfies both conditions.
+ * Total rewards required = 4
+ */
