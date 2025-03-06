@@ -1,84 +1,117 @@
-import java.util.*;
+
+import java.util.*; 
 
 public class Q4b {
-    static class Graph {
-        int nodes;
-        List<List<Integer>> adjList;
 
-        // Constructor to initialize the graph with given number of nodes
-        Graph(int nodes) {
-            this.nodes = nodes;
-            adjList = new ArrayList<>();
-            for (int i = 0; i < nodes; i++) {
-                adjList.add(new ArrayList<>());
-            }
-        }
+    // Method to calculate the minimum roads required to collect all packages
+    public static int minRoads(int[] packages, int[][] roads) {
+        int n = packages.length; // Number of cities (nodes)
 
-        // Method to add an edge between two nodes
-        void addEdge(int u, int v) {
-            adjList.get(u).add(v);
-            adjList.get(v).add(u);
-        }
-    }
-
-    // Function to determine the minimum roads needed to collect all packages
-    public static int minRoadsToCollectPackages(int[] packages, int[][] roads) {
-        int n = packages.length;
-        Graph graph = new Graph(n);
-
-        // Build the graph using the provided roads
-        for (int[] road : roads) {
-            graph.addEdge(road[0], road[1]);
-        }
-
-        // Identify locations where packages are present
-        Set<Integer> packageLocations = new HashSet<>();
+        // Initialize graph with adjacency lists
+        List<List<Integer>> graph = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            if (packages[i] == 1) {
-                packageLocations.add(i);
-            }
+            graph.add(new ArrayList<>()); // Creating adjacency list for each city
         }
 
-        // Find the shortest path to collect all packages starting from node 2
-        return shortestPath(graph, packageLocations, 2);
-    }
+        // Build the graph by adding roads between cities
+        for (int[] road : roads) {
+            graph.get(road[0]).add(road[1]); // Adding bidirectional edge
+            graph.get(road[1]).add(road[0]);
+        }
 
-    // BFS function to calculate the shortest path to collect all packages
-    private static int shortestPath(Graph graph, Set<Integer> packageLocations, int start) {
-        Queue<int[]> queue = new LinkedList<>();
-        boolean[] visited = new boolean[graph.nodes];
-        queue.offer(new int[] { start, 0 }); // Start node with distance 0
-        visited[start] = true;
+        // Initialize a variable to store the minimum roads count
+        int minRoads = Integer.MAX_VALUE;
 
-        while (!queue.isEmpty()) {
-            int[] curr = queue.poll();
-            int node = curr[0], dist = curr[1];
+        // Iterate through each city to start collecting packages
+        for (int start = 0; start < n; start++) {
+            int[] distances = bfs(graph, start, n); // Get distances from start city using BFS
+            Set<Integer> collected = new HashSet<>(); // Set to keep track of collected packages
 
-            // If current node has a package, remove it from the set
-            if (packageLocations.contains(node)) {
-                packageLocations.remove(node);
+            // Check cities that can be collected within 2 roads distance
+            for (int i = 0; i < n; i++) {
+                if (distances[i] <= 2 && packages[i] == 1) {
+                    collected.add(i); // Marking package as collected
+                }
             }
 
-            // If all packages are collected, return the distance traveled
-            if (packageLocations.isEmpty()) {
-                return dist;
+            // List of cities that are still left for collection
+            List<Integer> remaining = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                if (packages[i] == 1 && !collected.contains(i)) {
+                    remaining.add(i);
+                }
             }
 
-            // Explore the neighbors of the current node
-            for (int neighbor : graph.adjList.get(node)) {
-                if (!visited[neighbor]) {
-                    visited[neighbor] = true;
-                    queue.offer(new int[] { neighbor, dist + 1 });
+            // If all packages are collected, no roads are needed
+            if (remaining.isEmpty()) {
+                minRoads = Math.min(minRoads, 0);
+            } else {
+                // Try collecting remaining packages with one more road
+                for (int next : graph.get(start)) {
+                    int roadsUsed = 1; // Starting with the next road
+                    Set<Integer> newCollected = new HashSet<>(collected); // Copy collected set
+                    int[] nextDistances = bfs(graph, next, n); // Get distances from the next city
+
+                    // Collect packages from cities within 2 roads distance from the next city
+                    for (int i = 0; i < n; i++) {
+                        if (nextDistances[i] <= 2 && packages[i] == 1) {
+                            newCollected.add(i);
+                        }
+                    }
+
+                    // Check if all remaining packages are collected
+                    boolean allCollected = true;
+                    for (int i = 0; i < n; i++) {
+                        if (packages[i] == 1 && !newCollected.contains(i)) {
+                            allCollected = false;
+                            break;
+                        }
+                    }
+
+                    // If all packages are collected, update minimum roads
+                    if (allCollected) {
+                        roadsUsed += nextDistances[start]; // Add the return road distance
+                        minRoads = Math.min(minRoads, roadsUsed);
+                    }
                 }
             }
         }
-        return -1; // Return -1 if it's impossible to collect all packages
+
+        // If no valid solution was found, return -1; otherwise, return the minimum roads used
+        return minRoads == Integer.MAX_VALUE ? -1 : minRoads;
     }
 
-    // Main method to test the function
+    // Helper method for BFS to find distances from the start city
+    private static int[] bfs(List<List<Integer>> graph, int start, int n) {
+        int[] distances = new int[n]; // Array to store the distances to other cities
+        Arrays.fill(distances, -1); // Initialize all distances as -1
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(start); // Start BFS from the starting city
+        distances[start] = 0; // Distance to itself is 0
+
+        // Perform BFS to calculate distances
+        while (!queue.isEmpty()) {
+            int curr = queue.poll(); // Get the current city
+            for (int neighbor : graph.get(curr)) { // Visit all connected cities (neighbors)
+                if (distances[neighbor] == -1) { // If city hasn't been visited
+                    distances[neighbor] = distances[curr] + 1; // Update its distance
+                    queue.add(neighbor); // Add the city to the queue for further exploration
+                }
+            }
+        }
+        return distances; // Return the array of distances from the start city
+    }
+
+    // Main method to run tests on the algorithm
     public static void main(String[] args) {
-        int[] packages = { 1, 0, 0, 0, 0, 1 };
-        int[][] roads = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 5 } };
-        System.out.println(minRoadsToCollectPackages(packages, roads));
+        // Test case 1: 6 cities, some with packages to be collected
+        int[] packages1 = { 1, 0, 0, 0, 0, 1 }; // Cities with packages to be collected
+        int[][] roads1 = { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 4 }, { 4, 5 } }; // Roads connecting cities
+        System.out.println("Test 1: " + minRoads(packages1, roads1)); // Expected output: 1
+
+        // Test case 2: 8 cities with a more complex road network and packages
+        int[] packages2 = { 0, 0, 0, 1, 1, 0, 0, 1 };
+        int[][] roads2 = { { 0, 1 }, { 0, 2 }, { 1, 3 }, { 1, 4 }, { 2, 5 }, { 5, 6 }, { 5, 7 } };
+        System.out.println("Test 2: " + minRoads(packages2, roads2)); // Expected output: 2
     }
 }
